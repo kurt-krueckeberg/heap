@@ -15,31 +15,48 @@
 template<typename T> class Heap;
 
 template<typename T> class Heap {
-
-  
- 
- public:
+   
+  public:
  
     class Node {
       private:
         int priority;
         T   data; 
       public: 
-        friend bool operator < (const Node& lhs, const Node& rhs);
+        
         friend std::ostream& operator<< (std::ostream& ostr, Node& n);
-         
+                 
         Node(int pr, const T& t) : priority(pr), data(t) {}
  
-        T getData() const { return data; }
-        int getPriority() const { return priority; } 
+        T getData() const 
+        { 
+            return data; 
+        }
+        
+        int getPriority() const 
+        { 
+            return priority; 
+        } 
+        
+        friend bool operator < (const Node& lhs, const Node& rhs)
+        { 
+            return lhs.getPriority() < rhs.getPriority();
+        }
+        
+        friend bool operator > (const Node& lhs, const Node& rhs)
+        {
+                return lhs.getPriority() > rhs.getPriority();
+        }
     };
        
     private:
         
          std::vector<Node> vec;
+         void swim(int pos); // bottom-up reheapify 
     protected:
      
         void rebuildHeap(int);          
+
     public:   
      Heap(int size);
      Heap();
@@ -47,7 +64,7 @@ template<typename T> class Heap {
      int getNumberOfNodes() const;
      int getHeight() const;
      T peekTop() const;
-     bool add(int pri, const T& t);
+     void add(int priority, const T& t);
      int remove(T& t);
      void clear();
      
@@ -78,7 +95,6 @@ template<typename T> inline Heap<T>::Heap(int size) : vec(size)
 template<typename T> inline Heap<T>::Heap() : vec()
 {
 }
-
 // What if is is empty?
 template<typename T> int Heap<T>::remove(T& t)
 {
@@ -86,30 +102,27 @@ template<typename T> int Heap<T>::remove(T& t)
    int priority = vec[0].getPriority();
      
    // put last item in root
-   vec[0] = vec.pop_back();
+   vec[0] = vec[vec.size() - 1];
+           
+   vec.pop_back();
 
    rebuildHeap(0);
 
    return priority;
 }
 
-template<typename T> bool Heap<T>::add(int x, const T& t)
+template<typename T> void Heap<T>::swim(int index)
 {
-    vec.push_back(Node(x, t)); // use emplace instead?
-
-    int index = vec.size() - 1;
-
-    bool inPlace = false;
-
-    int parentIndex;
     // move new item up
-    while (index >= 0 && !inPlace) {
+    int parentIndex;
+
+    while (index > 0) { // && !inPlace) {
 
         parentIndex = (index - 1) / 2;
-
+        
         if (vec[index] < vec[parentIndex]) {
-
-           inPlace = true;
+       
+           break; // inPlace = true;
 
         }  else {        
 
@@ -117,8 +130,33 @@ template<typename T> bool Heap<T>::add(int x, const T& t)
 
            index = parentIndex;
         }
-    } 
-    return true;
+    }
+    /*
+    while (index >= 0) && !inPlace) {
+
+        parentIndex = (index - 1) / 2;
+        
+        if (vec[index] < vec[parentIndex]) {
+       
+            inPlace = true;
+
+        }  else {        
+
+           std::swap(vec[index], vec[parentIndex]);
+
+           index = parentIndex;
+        }
+    }
+    */
+}
+
+template<typename T> void Heap<T>::add(int x, const T& t)
+{
+    vec.push_back(Node(x, t)); // use emplace instead?
+
+    int index = vec.size() - 1;
+
+    swim(index);
 }
 
 template<typename T> inline void Heap<T>::rebuildHeap(int root)
@@ -143,13 +181,6 @@ template<typename T> inline void Heap<T>::rebuildHeap(int root)
            rebuildHeap(child);
       }  
   }
-}
-
-
-template<typename T> 
-bool operator< (const typename Heap<T>::Node& lhs, const typename Heap<T>::Node& rhs)
-{
-   return lhs.priority < rhs.priority;
 }
 
 template<typename T> std::ostream& operator<< (std::ostream& ostr, const typename Heap<T>::Node& n)
