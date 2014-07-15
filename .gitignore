@@ -1,0 +1,7 @@
+Makefile
+walls-mirrors-heap.pdf
+dist/
+docs/
+build/
+nbproject/
+readme.txt
