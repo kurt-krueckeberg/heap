@@ -55,7 +55,7 @@ template<typename T> class Heap {
          void swim(int pos); // bottom-up reheapify 
     protected:
      
-        void rebuildHeap(int);          
+        void rebuildHeap(int pos);          
 
     public:   
      Heap(int size);
@@ -116,13 +116,13 @@ template<typename T> void Heap<T>::swim(int index)
     // move new item up
     int parentIndex;
 
-    while (index > 0) { // && !inPlace) {
+    while (index > 0) { 
 
         parentIndex = (index - 1) / 2;
         
         if (vec[index] < vec[parentIndex]) {
        
-           break; // inPlace = true;
+           break; 
 
         }  else {        
 
@@ -131,23 +131,6 @@ template<typename T> void Heap<T>::swim(int index)
            index = parentIndex;
         }
     }
-    /*
-    while (index >= 0) && !inPlace) {
-
-        parentIndex = (index - 1) / 2;
-        
-        if (vec[index] < vec[parentIndex]) {
-       
-            inPlace = true;
-
-        }  else {        
-
-           std::swap(vec[index], vec[parentIndex]);
-
-           index = parentIndex;
-        }
-    }
-    */
 }
 
 template<typename T> void Heap<T>::add(int x, const T& t)
