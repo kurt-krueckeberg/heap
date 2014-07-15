@@ -6,47 +6,59 @@
  *
  * Created on July 15, 2014, 12:10 PM
  */
-
 #include <vector>
 
 template<typename T> class Heap {
 
   std::vector<T> vec;
 
-   protected:
-
-    
  public:
  
-   class Node {
-     private:
-       int priority;
-       T   data; 
-     public: 
-       friend bool operator < (const Node& lhs, const Node& rhs);
-
-       Node(int pr, const T& t) : priority(pr), data(t) {}
-
-       T getData() const { return data}
-       int getPriority() const { return priority; } 
-   };
-   
+    class Node {
+      private:
+        int priority;
+        T   data; 
+      public: 
+        friend bool operator < (const Node& lhs, const Node& rhs);
+ 
+        Node(int pr, const T& t) : priority(pr), data(t) {}
+ 
+        T getData() const { return data}
+        int getPriority() const { return priority; } 
+    };
     
-   public:
-      Heap(int size);
-      bool isEmpty();
-      int getNumberOfNodes() const;
-      int getHeight() const;
-      T peekTop() const;
-      bool add(const T& t);
-      int remove(T& t);
-      void clear();
+    
+     Heap(int size);
+     bool isEmpty() const;
+     int getNumberOfNodes() const;
+     int getHeight() const;
+     T peekTop() const;
+     bool add(const T& t);
+     int remove(T& t);
+     void clear();
 };
 
 inline bool operator < (const Node& lhs, const Node& rhs)
 {
    return lhs.priority < rhs.priority;
 }
+
+template<typename T> inline Heap<T>::isEmpty() const
+{
+  return vec.size() == 0;
+}
+
+template<typename T> inline T Heap<T>::peekTop() const
+{
+   if (vec.size() > 0) {
+
+      return vec[0].getData();
+
+   } else {
+
+   }
+}
+
 template<typename T> inline Heap<T>::Heap(int size) : vec(size)
 {
 }
