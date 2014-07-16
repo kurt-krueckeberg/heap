@@ -86,6 +86,7 @@ template<typename T> class Heap {
      void clear();
      
      void print(std::ostream& ostr);
+     template<typename U> friend std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap);
 };
        
 
@@ -181,6 +182,32 @@ template<typename T> inline void Heap<T>::rebuildHeap(int root)
            rebuildHeap(child);
       }  
   }
+}
+
+template<typename T> void Heap<T>::print(std::ostream&  ostr)
+{
+    typename std::vector<  Heap<T>::Node >::iterator iter = vec.begin();
+    typename std::vector<  Heap<T>::Node >::iterator iter_end = vec.begin();
+    
+    for (;iter != iter_end; ++iter) {
+        
+      ostr << " Priority: " << iter->getPriority() << " Value:" << iter->getData() << " ";
+    }  
+      
+    
+}
+
+template<typename U> std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap)
+{
+    typename std::vector<  typename Heap<U>::Node >::const_iterator iter = heap.vec.begin();
+    typename std::vector<  typename Heap<U>::Node >::const_iterator iter_end = heap.vec.end();
+    
+    for (;iter != iter_end; ++iter) {
+        
+      ostr << "[Priority: " << iter->getPriority() << " Value: " << iter->getData() << "], ";
+    }  
+      
+    return ostr;
 }
 
 #endif	

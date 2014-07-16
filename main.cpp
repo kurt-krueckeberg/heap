@@ -18,6 +18,7 @@ int main(int argc, char** argv)
     for (auto i = 10; i < 120;  i += 10) {
         
         double dble = static_cast<double>(i);
+        dble -= 5;
         
         int priority = i;
         
@@ -30,7 +31,7 @@ int main(int argc, char** argv)
         
         h.remove(d);
         cout << "The top of the heap was: " << d << endl;
-        
+        cout << "Heap is: " <<  h << endl;
     }
      
     
