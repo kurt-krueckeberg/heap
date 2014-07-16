@@ -30,6 +30,7 @@ int main(int argc, char** argv)
         
         h.remove(d);
         cout << "The top of the heap was: " << d << endl;
+        
     }
      
     
