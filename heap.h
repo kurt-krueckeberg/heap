@@ -11,6 +11,8 @@
 #include <iterator>
 #include <algorithm>
 #include <vector>
+#include <exception>
+
 template<typename T> class Heap; // forward declaration
 
 template<typename T> class Heap {
@@ -84,11 +86,9 @@ template<typename T> class Heap {
      Heap(int size);
      Heap();
      bool isEmpty() const;
-     int getNumberOfNodes() const;
-     int getHeight() const;
-     T peekTop() const;
+     T peekTop() const throw(std::logic_error);
      void add(int priority, const T& t);
-     int remove(T& t);
+     bool remove();
      void clear();
      
      template<typename U> friend std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap);
@@ -100,14 +100,15 @@ template<typename T> inline bool Heap<T>::isEmpty() const
   return vec.size() == 0;
 }
 
-template<typename T> inline T Heap<T>::peekTop() const
+template<typename T> T Heap<T>::peekTop() const throw(std::logic_error)
 {
    if (vec.size() > 0) {
 
       return vec[0].getData();
 
    } else {
-
+   
+      throw std::logic_error(std::string("peekTop() called on empty heap"));
    }
 }
 
@@ -119,10 +120,13 @@ template<typename T> inline Heap<T>::Heap() : vec()
 {
 }
 // What if is is empty?
-template<typename T> int Heap<T>::remove(T& t)
+template<typename T> bool Heap<T>::remove()
 {
-   t = vec[0].getData();
-   int priority = vec[0].getPriority();
+   if (vec.empty()) {
+       return false;
+   }
+   //t = vec[0].getData();
+   //int priority = vec[0].getPriority();
      
    // put last item in root
    vec[0] = vec[vec.size() - 1];
@@ -131,7 +135,7 @@ template<typename T> int Heap<T>::remove(T& t)
 
    rebuildHeap(0);
 
-   return priority;
+   return true;
 }
 
 template<typename T> void Heap<T>::swim(int index)

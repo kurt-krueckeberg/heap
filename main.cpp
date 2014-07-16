@@ -29,8 +29,9 @@ int main(int argc, char** argv)
     
     while (!h.isEmpty()) {
         
-        h.remove(d);
+        d = h.peekTop();
         cout << "The top of the heap was: " << d << endl;
+        h.remove();
         cout << "Heap is: " <<  h << endl;
     }
      
