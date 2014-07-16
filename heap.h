@@ -56,7 +56,7 @@ template<typename T> class Heap {
         } 
          
         friend bool operator< (const Node& lhs, const Node& rhs)
-        {
+        { 
             return lhs.getPriority() < rhs.getPriority();
         }
         
@@ -64,6 +64,12 @@ template<typename T> class Heap {
         {
             return rhs < lhs;
         }    
+        
+        friend std::ostream& operator << (std::ostream& ostr, const Node& rhs)
+        {
+            ostr << "[Priority: " << rhs.getPriority() << "; Data: " << rhs.getData() << "]";
+            return ostr;
+        }
     };
        
     private:
@@ -85,7 +91,6 @@ template<typename T> class Heap {
      int remove(T& t);
      void clear();
      
-     void print(std::ostream& ostr);
      template<typename U> friend std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap);
 };
        
@@ -184,29 +189,22 @@ template<typename T> inline void Heap<T>::rebuildHeap(int root)
   }
 }
 
-template<typename T> void Heap<T>::print(std::ostream&  ostr)
-{
-    typename std::vector<  Heap<T>::Node >::iterator iter = vec.begin();
-    typename std::vector<  Heap<T>::Node >::iterator iter_end = vec.begin();
-    
-    for (;iter != iter_end; ++iter) {
-        
-      ostr << " Priority: " << iter->getPriority() << " Value:" << iter->getData() << " ";
-    }  
-      
-    
-}
-
 template<typename U> std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap)
 {
+    /*
     typename std::vector<  typename Heap<U>::Node >::const_iterator iter = heap.vec.begin();
     typename std::vector<  typename Heap<U>::Node >::const_iterator iter_end = heap.vec.end();
     
     for (;iter != iter_end; ++iter) {
         
-      ostr << "[Priority: " << iter->getPriority() << " Value: " << iter->getData() << "], ";
-    }  
+       ostr << "[Priority: " << iter->getPriority() << " Value: " << iter->getData() << "], ";
+    } 
+    ostr << "\n===================\n" << std::endl;
+    */
+    
+    std::ostream_iterator<typename Heap<U>::Node> out_it(ostr, ", ");
       
+    std::copy (heap.vec.begin(), heap.vec.end(), out_it);
     return ostr;
 }
 
