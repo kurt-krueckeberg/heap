@@ -77,10 +77,10 @@ template<typename T> class Heap {
     private:
         
          std::vector<Node> vec;
-         void swim(int pos); // bottom-up reheapify 
+         void swim(int pos); // bottom-up reheapify ("swim up") 
     protected:
      
-        void rebuildHeap(int pos);          
+        void sink(int pos); // top-down reheapify ("sink down")        
 
     public:   
      Heap(int size);
@@ -133,7 +133,7 @@ template<typename T> bool Heap<T>::remove()
            
    vec.pop_back();
 
-   rebuildHeap(0);
+   sink(0);
 
    return true;
 }
@@ -169,7 +169,7 @@ template<typename T> void Heap<T>::add(int x, const T& t)
     swim(index); // heapify upwards
 }
 
-template<typename T> inline void Heap<T>::rebuildHeap(int root)
+template<typename T> inline void Heap<T>::sink(int root)
 {
   int child = 2 * root + 1; // index of root's left child
 
@@ -188,7 +188,7 @@ template<typename T> inline void Heap<T>::rebuildHeap(int root)
 
            std::swap(vec[root], vec[child]); 
 
-           rebuildHeap(child);
+           sink(child);
       }  
   }
 }
