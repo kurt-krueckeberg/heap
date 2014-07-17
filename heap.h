@@ -195,19 +195,7 @@ template<typename T> inline void Heap<T>::sink(int root)
 
 template<typename U> std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap)
 {
-    /*
-    typename std::vector<  typename Heap<U>::Node >::const_iterator iter = heap.vec.begin();
-    typename std::vector<  typename Heap<U>::Node >::const_iterator iter_end = heap.vec.end();
-    
-    for (;iter != iter_end; ++iter) {
-        
-       ostr << "[Priority: " << iter->getPriority() << " Value: " << iter->getData() << "], ";
-    } 
-    ostr << "\n===================\n" << std::endl;
-    */
-    
     std::ostream_iterator<typename Heap<U>::Node> out_it(ostr, ", ");
-      
     std::copy (heap.vec.begin(), heap.vec.end(), out_it);
     return ostr;
 }
