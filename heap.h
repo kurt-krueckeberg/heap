@@ -34,17 +34,8 @@ template<typename T> class Heap {
         {
         }
 
-        Node& operator= (const Node& n)
-        {
-           if (this != &n) { 
-               
-             priority = n.priority;
-             data = n.data;
-             
-           } 
-           return *this;
-        }
- 
+        Node& operator= (const Node& n);
+         
         T getData() const 
         { 
             return data; 
@@ -98,7 +89,16 @@ template<typename T> class Heap {
      
      template<typename U> friend std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap);
 };
-       
+template<typename T> typename Heap<T>::Node& Heap<T>::Node::operator= (const typename Heap<T>::Node& n)
+        {
+           if (this != &n) { 
+               
+             priority = n.priority;
+             data = n.data;
+             
+           } 
+           return *this;
+        }       
 
 template<typename T> inline bool Heap<T>::isEmpty() const
 {
