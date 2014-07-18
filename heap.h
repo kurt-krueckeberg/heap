@@ -30,7 +30,7 @@ template<typename T> class Heap {
                       
         Node(int pr, const T& t) : priority(pr), data(t) {}
 
-        Node(const Node& n) : priority(n.priotiry), n.data(data)
+        Node(const Node& n) : priority(n.priority), data(n.data)
         {
         }
 
@@ -55,12 +55,12 @@ template<typename T> class Heap {
             return priority; 
         } 
          
-        bool operator< (const Node& lhs, const Node& rhs)
+        friend bool operator< (const Node& lhs, const Node& rhs)
         { 
             return lhs.getPriority() < rhs.getPriority();
         }
         
-        bool operator> (const Node& lhs, const Node& rhs)
+        friend bool operator> (const Node& lhs, const Node& rhs)
         {
             return rhs < lhs;
         }    
