@@ -18,22 +18,20 @@ template<typename T> class Heap; // forward declaration
 template<typename T> class Heap {
    
   public:
-    class Node; //forward declaration;
+    class Node; //forward declaration of nested class
     class Node {
         
       friend class Heap<T>;  
       
       private:
         int priority;
-        T   data; 
+        T   data;     
       public: 
                       
         Node(int pr, const T& t) : priority(pr), data(t) {}
 
-        Node(const Node& n)
+        Node(const Node& n) : priority(n.priotiry), n.data(data)
         {
-           priority = n.priority;
-           data = n.data;
         }
 
         Node& operator= (const Node& n)
@@ -57,12 +55,12 @@ template<typename T> class Heap {
             return priority; 
         } 
          
-        friend bool operator< (const Node& lhs, const Node& rhs)
+        bool operator< (const Node& lhs, const Node& rhs)
         { 
             return lhs.getPriority() < rhs.getPriority();
         }
         
-        friend bool operator> (const Node& lhs, const Node& rhs)
+        bool operator> (const Node& lhs, const Node& rhs)
         {
             return rhs < lhs;
         }    
@@ -76,11 +74,18 @@ template<typename T> class Heap {
        
     private:
         
-         std::vector<Node> vec;
-         void swim(int pos); // bottom-up reheapify ("swim up") 
+        std::vector<Node> vec;
+        /* 
+         * bottom-up reheapify ("swim up"). Continue to swap the value in index pos with the appropriate value above it, if necessary,
+         * until we again have a valid heap. 
+         */ 
+        void swim(int pos); 
     protected:
-     
-        void sink(int pos); // top-down reheapify ("sink down")        
+     /*
+      * top-down reheapify. Move the value in index pos downward ("sink down"), if necessary, until we again 
+      * have a valid heap        
+      */
+        void sink(int pos); 
 
     public:   
      Heap(int size);
@@ -119,28 +124,27 @@ template<typename T> inline Heap<T>::Heap(int size) : vec(size)
 template<typename T> inline Heap<T>::Heap() : vec()
 {
 }
-// What if is is empty?
+
 template<typename T> bool Heap<T>::remove()
 {
    if (vec.empty()) {
+
        return false;
    }
-   //t = vec[0].getData();
-   //int priority = vec[0].getPriority();
      
    // put last item in root
    vec[0] = vec[vec.size() - 1];
            
-   vec.pop_back();
+   vec.pop_back(); // then remove the formerly last item
 
-   sink(0);
+   sink(0);  
 
    return true;
 }
 
 template<typename T> void Heap<T>::swim(int index)
 {
-    // move new item up
+    // move new item up until we have a valid heap
     int parentIndex;
 
     while (index > 0) { 
@@ -171,23 +175,25 @@ template<typename T> void Heap<T>::add(int x, const T& t)
 
 template<typename T> inline void Heap<T>::sink(int root)
 {
-  int child = 2 * root + 1; // index of root's left child
+  int child = 2 * root + 1; // child set to index of root's prospective left child
 
   if (child < vec.size()) {
 
-     // root is not a leaf, so it has a left child at child    
+     // root was not a leaf, so it has a left child at child    
      
      int right_child = child + 1; // index of right child, if any
 
      if (right_child < vec.size() && vec[right_child] > vec[child]) {
             
-           child = right_child; // index of larger child  
+           child = right_child; // child is now is the index of larger child  
       }
-           
+
+      // Swap root with larger child, if root smaller      
       if (vec[root] < vec[child]) {
 
            std::swap(vec[root], vec[child]); 
 
+           // ... and continue the process 
            sink(child);
       }  
   }
@@ -201,4 +207,3 @@ template<typename U> std::ostream&  operator<<(std::ostream&  ostr, const Heap<U
 }
 
 #endif	
-
