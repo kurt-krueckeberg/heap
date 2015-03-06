@@ -202,8 +202,9 @@ template<typename T> inline void Heap<T>::sink(int root)
 template<typename U> std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap)
 {
     std::ostream_iterator<typename Heap<U>::Node> out_it(ostr, ", ");
+
     std::copy (heap.vec.begin(), heap.vec.end(), out_it);
+
     return ostr;
 }
-
 #endif	
