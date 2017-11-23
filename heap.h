@@ -83,14 +83,15 @@ template<typename T> class Heap {
      Heap(int size);
      Heap();
      bool isEmpty() const;
-     T peekTop() const throw(std::logic_error);
+     T peekTop() const;
      void add(int priority, const T& t);
      bool remove();
      void clear();
      
      template<typename U> friend std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap);
 };
-template<typename T> typename Heap<T>::Node& Heap<T>::Node::operator= (const typename Heap<T>::Node& n)
+
+template<typename T> typename Heap<T>::Node& Heap<T>::Node::operator=(const typename Heap<T>::Node& n)
 {
    if (this != &n) { 
                
@@ -105,7 +106,7 @@ template<typename T> inline bool Heap<T>::isEmpty() const
   return vec.size() == 0;
 }
 
-template<typename T> T Heap<T>::peekTop() const throw(std::logic_error)
+template<typename T> T Heap<T>::peekTop() const
 {
    if (vec.size() > 0) {
 
@@ -175,20 +176,18 @@ template<typename T> void Heap<T>::add(int x, const T& t)
 
 template<typename T> inline void Heap<T>::sink(int root)
 {
-  int child = 2 * root + 1; // child set to index of root's prospective left child
+  int child = 2 * root + 1; // Determine if root is a leaf.
 
-  if (child < vec.size()) {
+  if (child < vec.size()) {  // If root is not a leaf, get the index of its largest child, either left or right
 
-     // root was not a leaf, so it has a left child at child    
-     
-     int right_child = child + 1; // index of right child, if any
+     int right_child = child + 1; 
 
-     if (right_child < vec.size() && vec[right_child] > vec[child]) {
+     if (vec[right_child] > vec[child]) {
             
-           child = right_child; // child is now is the index of larger child  
+           child = right_child; 
       }
 
-      // Swap root with larger child, if root smaller      
+      // If root smaller than right child, swap root with larger child...
       if (vec[root] < vec[child]) {
 
            std::swap(vec[root], vec[child]); 
