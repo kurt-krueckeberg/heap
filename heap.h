@@ -17,7 +17,7 @@ template<typename T> class Heap; // forward declaration
 
 template<typename T> class Heap {
    
-  public:
+  private:
     class Node; //forward declaration of nested class
     class Node {
         
@@ -33,8 +33,13 @@ template<typename T> class Heap {
         Node(const Node& n) : priority(n.priority), data(n.data)
         {
         }
+        
+        Node(Node&& node) : priority(std::move(node.priority)), data(std::move(node.data)) 
+        {
+        }
 
-        Node& operator= (const Node& n);
+        Node& operator=(const Node& n);
+        Node& operator=(Node&& n);
          
         T getData() const 
         { 
@@ -62,21 +67,18 @@ template<typename T> class Heap {
             return ostr;
         }
     };
-       
-    private:
-        
-        std::vector<Node> vec;
-        /* 
-         * bottom-up reheapify ("swim up"). Continue to swap the value in index pos with the appropriate value above it, if necessary,
-         * until we again have a valid heap. 
-         */ 
-        void swim(int pos); 
-    protected:
-     /*
-      * top-down reheapify. Move the value in index pos downward ("sink down"), if necessary, until we again 
-      * have a valid heap        
-      */
-        void sink(int pos); 
+    std::vector<Node> vec;
+    /* 
+     * bottom-up reheapify ("swim up"). Continue to swap the value in index pos with the appropriate value above it, if necessary,
+     * until we again have a valid heap. 
+     */ 
+    void swim(int pos); 
+    
+    /*
+     * top-down reheapify. Move the value in index pos downward ("sink down"), if necessary, until we again 
+     * have a valid heap        
+     */
+    void sink(int pos); 
 
     public:   
         
@@ -97,6 +99,16 @@ template<typename T> typename Heap<T>::Node& Heap<T>::Node::operator=(const type
                
         priority = n.priority;
         data = n.data;
+    } 
+    return *this;
+}       
+
+template<typename T> typename Heap<T>::Node& Heap<T>::Node::operator=(typename Heap<T>::Node&& n)
+{
+   if (this != &n) { 
+               
+        priority = std::move(n.priority);
+        data = std::move(n.data);
     } 
     return *this;
 }       
