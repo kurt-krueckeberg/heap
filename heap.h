@@ -8,7 +8,7 @@
 #include <vector>
 #include <exception>
 
-template<typename T> class Heap {
+template<typename T, class Comp=std::less<T>> class Heap {
   
     class Node {
       
@@ -60,7 +60,8 @@ template<typename T> class Heap {
             return ostr;
         }
     };
-    
+
+    Comp compare;
     std::vector<Node> vec;
     
     /* 
@@ -156,6 +157,7 @@ template<typename T> bool Heap<T>::remove()
    return true;
 }
 
+/* prior code
 template<typename T> void Heap<T>::swim(int index)
 {
     // Move new item up until we have a valid heap
@@ -177,7 +179,29 @@ template<typename T> void Heap<T>::swim(int index)
         }
     }
 }
+*/
 
+template<typename T> void Heap<T>::swim(int index)
+{
+    // Move new item up until we have a valid heap
+    int parentIndex;
+
+    while (index > 0) { 
+
+        parentIndex = (index - 1) / 2;
+        
+       if (compare(vec[index], vec[parentIndex])) {
+       
+           break; 
+
+        }  else {        
+
+           std::swap(vec[index], vec[parentIndex]);
+
+           index = parentIndex;
+        }
+    }
+}
 template<typename T> void Heap<T>::add(int x, const T& t)
 {
     vec.push_back(Node(x, t)); 
@@ -190,7 +214,7 @@ template<typename T> void Heap<T>::add(int x, const T& t)
 /*
  * Move the new root downward until we have a valid heap.
  */
-
+/* Prior code
 template<typename T> inline void Heap<T>::sink(int root)
 {
   int child = 2 * root + 1; // Determine if root is a leaf.
@@ -214,7 +238,31 @@ template<typename T> inline void Heap<T>::sink(int root)
       }  
   }
 }
+*/
  
+template<typename T> inline void Heap<T>::sink(int root)
+{
+  int child = 2 * root + 1; // Determine if root is a leaf.
+
+  if (child < vec.size()) {  // If root is not a leaf, get the index of its largest child, either left or right
+
+     int right_child = child + 1; 
+
+     if (compare(vec[child], vec[right_child])) {
+            
+           child = right_child; 
+      }
+
+      // If root smaller than right child, swap root with larger child...
+      if (compare(vec[root], vec[child])) {
+
+           std::swap(vec[root], vec[child]); 
+
+           // ... and continue the process 
+           sink(child);
+      }  
+  }
+}
 template<typename U> std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap)
 {
     std::ostream_iterator<typename Heap<U>::Node> out_it(ostr, ", ");
