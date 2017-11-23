@@ -199,7 +199,7 @@ template<typename T> inline void Heap<T>::sink(int root)
 
      int right_child = child + 1; 
 
-     if (vec[right_child] > vec[child]) {
+     if (vec[child] < vec[right_child]) {
             
            child = right_child; 
       }
