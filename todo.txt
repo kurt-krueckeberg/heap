@@ -1,0 +1,3 @@
+ Add 
+
+Comparator so as to make the heap either a min or max heap.
