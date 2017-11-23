@@ -75,6 +75,12 @@ template<typename T> class Heap {
      */
     void sink(int pos); 
 
+    bool is_leaf(int pos) const noexcept 
+    { 
+       int left_child = 2 * pos + 1;
+       return (left_child >= vec.size() ? true : false; 
+    }  
+
     public:   
         
      Heap(int size);
