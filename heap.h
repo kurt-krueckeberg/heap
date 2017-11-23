@@ -1,10 +1,5 @@
 #ifndef HEAP_H_23974923874
 #define HEAP_H_23974923874
-/* 
- * File:   heap.h
- *
- * Created on July 15, 2014, 12:10 PM
- */
 #include <iosfwd>
 #include <ostream>
 #include <iostream>
@@ -13,17 +8,10 @@
 #include <vector>
 #include <exception>
 
-template<typename T> class Heap; // forward declaration
-
 template<typename T> class Heap {
-   
-  private:
-    class Node; //forward declaration of nested class
+  
     class Node {
-        
-      friend class Heap<T>;  
       
-      private:
         int priority;
         T   data;     
       public: 
@@ -41,11 +29,16 @@ template<typename T> class Heap {
         Node& operator=(const Node& n);
         Node& operator=(Node&& n);
          
-        T getData() const 
+        const T& getData() const 
         { 
             return data; 
         }
-        
+         
+        T& getData() 
+        { 
+            return data; 
+        }
+
         int getPriority() const 
         { 
             return priority; 
@@ -67,9 +60,11 @@ template<typename T> class Heap {
             return ostr;
         }
     };
+    
     std::vector<Node> vec;
+    
     /* 
-     * bottom-up reheapify ("swim up"). Continue to swap the value in index pos with the appropriate value above it, if necessary,
+     * bottom-up repair of heap property ("swim up"). Continues to swap the value in index pos with the parent until parent is not less than vec[pos].
      * until we again have a valid heap. 
      */ 
     void swim(int pos); 
@@ -213,7 +208,7 @@ template<typename T> inline void Heap<T>::sink(int root)
       }  
   }
 }
-
+ 
 template<typename U> std::ostream&  operator<<(std::ostream&  ostr, const Heap<U>& heap)
 {
     std::ostream_iterator<typename Heap<U>::Node> out_it(ostr, ", ");
