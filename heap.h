@@ -12,6 +12,10 @@
  * using max_heap = Heap<double> // Heap<double, less<int>>
  * using min_heap = Heap<double, greater<int>>
  */
+template<class T, class Comp> class Heap; // fwd declaration
+using max_heap<class T> = Heap<T, less<int>>;
+using mix_heap<class T> = Heap<T, greater<int>>;
+
 template<class T, class Comp=std::less<int> > class Heap {
   
     class Node {
