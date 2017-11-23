@@ -150,14 +150,14 @@ template<typename T> bool Heap<T>::remove()
            
    vec.pop_back(); // then remove the formerly last item
 
-   sink(0);  
+   sink(0);  // repair heap property
 
    return true;
 }
 
 template<typename T> void Heap<T>::swim(int index)
 {
-    // move new item up until we have a valid heap
+    // Move new item up until we have a valid heap
     int parentIndex;
 
     while (index > 0) { 
@@ -183,8 +183,12 @@ template<typename T> void Heap<T>::add(int x, const T& t)
 
     int index = vec.size() - 1;
 
-    swim(index); // heapify upwards
+    swim(index); // repair heap property
 }
+
+/*
+ * Move the new root downward until we have a valid heap.
+ */
 
 template<typename T> inline void Heap<T>::sink(int root)
 {
