@@ -218,12 +218,4 @@ template<class T, class Comp> inline void Heap<T, Comp>::sink(int root)
       }  
   }
 }
-template<class T, class Comp> std::ostream&  operator<<(std::ostream&  ostr, const Heap<T, Comp>& heap)
-{
-    std::ostream_iterator<typename Heap<T, Comp>::Node> out_it(ostr, ", ");
-
-    std::copy(heap.vec.begin(), heap.vec.end(), out_it);
-
-    return ostr;
-}
 #endif	
