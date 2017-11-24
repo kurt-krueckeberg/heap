@@ -14,7 +14,7 @@ using namespace std;
 int main(int argc, char** argv) 
 {
     heap<double> h;
-    min_heap<double> h2;
+    heap<double> h2; // TODO: try min_heap<double> h2
     
     for (auto i = 10; i < 120;  i += 10) {
         
