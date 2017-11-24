@@ -1,5 +1,5 @@
-1. Implemnt levelOrderTraverse() to use an iterator. To implement the iterator class modelled after tree234, I first need to change heap to have a value_type that should be std::pair<int, T>. This will force the other existing
-methods to be changed slightly. So first test the code after adding the std::pair<int, T> and then after adding the iterator.
+1. To port levelOrderTraverse() from tree234, it is probably best to implement a custom iterator class like that in tree234. This would require changing heap to have a nested type of "value_type" that would be std::pair<int, T>. This will
+force the other existing methods to be changed slightly. So it is best to first test the code after adding the std::pair<int, T> and then again after adding the iterator class.
 
 
 2. Test min_heap using the method printLevelOrder().
