@@ -13,7 +13,8 @@ using namespace std;
 
 int main(int argc, char** argv) 
 {
-    Heap<double> h;
+    heap<double> h;
+    min_heap<double> h2;
     
     for (auto i = 10; i < 120;  i += 10) {
         
@@ -22,17 +23,17 @@ int main(int argc, char** argv)
         
         int priority = i;
         
-         h.add(priority, dble);
+         h2.add(priority, dble);
     }
     
     double d;
     
-    while (!h.isEmpty()) {
+    while (!h2.isEmpty()) {
         
-        d = h.peekTop();
+        d = h2.peekTop();
         cout << "The top of the heap was: " << d << endl;
-        h.remove();
-        cout << "Heap is: " <<  h << endl;
+        h2.remove();
+        cout << "Heap is: " <<  h2 << endl;
     }
      
     

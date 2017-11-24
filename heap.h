@@ -9,17 +9,13 @@
 #include <exception>
 /*
  * Generic heaps that works as max heap and min heap. i.e., 
- * using max_heap = Heap<double> // Heap<double, less<int>>
- * using min_heap = Heap<double, greater<int>>
+ * using max_heap = heap<double> // heap<double, less<int>>
+ * using min_heap = heap<double, greater<int>>
  */
-template<class T, class Comp> class Heap; // fwd declaration
-using max_heap<class T> = Heap<T, less<int>>;
-using mix_heap<class T> = Heap<T, greater<int>>;
-
-template<class T, class Comp=std::less<int> > class Heap {
+template<class T, class Comp=std::less<int> > class heap {
   
     class Node {
-        friend class Heap<T, Comp>;
+        friend class heap<T, Comp>;
         int priority;
         T   data;     
       public: 
@@ -85,25 +81,37 @@ template<class T, class Comp=std::less<int> > class Heap {
 
     public:   
         
-     Heap(int size);
-     Heap();
+     heap(int size);
+     heap();
      bool isEmpty() const;
      T peekTop() const;
      void add(int priority, const T& t);
      bool remove();
      void clear();
     
-    friend std::ostream&  operator<<(std::ostream&  ostr, const Heap& heap)  
+    friend std::ostream&  operator<<(std::ostream&  ostr, const heap& heap)  
     {
-     std::ostream_iterator<typename Heap::Node> out_it(ostr, ", ");
+     std::ostream_iterator<typename heap::Node> out_it(ostr, ", ");
 
      std::copy(heap.vec.begin(), heap.vec.end(), out_it);
 
      return ostr;
     }
+    
+    std::ostream& printLevelOrder(std::ostream&) const noexcept;
 };
 
-template<class T, class Comp> typename Heap<T, Comp>::Node& Heap<T, Comp>::Node::operator=(const typename Heap<T, Comp>::Node& n)
+
+template<class T> class max_heap : public heap<T>  {}; 
+template<class T> class min_heap : public heap<T, std::greater<T>>  {}; 
+
+template<class T, class Comp> std::ostream& heap<T, Comp>::printLevelOrder(std::ostream& ostr) const noexcept
+{
+    // TODO: Borrow code from ~/4/include/tree234.h
+    
+}
+
+template<class T, class Comp> typename heap<T, Comp>::Node& heap<T, Comp>::Node::operator=(const typename heap<T, Comp>::Node& n)
 {
    if (this != &n) { 
                
@@ -113,7 +121,7 @@ template<class T, class Comp> typename Heap<T, Comp>::Node& Heap<T, Comp>::Node:
     return *this;
 }       
 
-template<class T, class Comp> typename Heap<T, Comp>::Node& Heap<T, Comp>::Node::operator=(typename Heap<T, Comp>::Node&& n)
+template<class T, class Comp> typename heap<T, Comp>::Node& heap<T, Comp>::Node::operator=(typename heap<T, Comp>::Node&& n)
 {
    if (this != &n) { 
                
@@ -123,12 +131,12 @@ template<class T, class Comp> typename Heap<T, Comp>::Node& Heap<T, Comp>::Node:
     return *this;
 }       
 
-template<class T, class Comp> inline bool Heap<T, Comp>::isEmpty() const
+template<class T, class Comp> inline bool heap<T, Comp>::isEmpty() const
 {
   return vec.size() == 0;
 }
 
-template<class T, class Comp> T Heap<T, Comp>::peekTop() const
+template<class T, class Comp> T heap<T, Comp>::peekTop() const
 {
    if (vec.size() > 0) {
 
@@ -140,15 +148,15 @@ template<class T, class Comp> T Heap<T, Comp>::peekTop() const
    }
 }
 
-template<class T, class Comp> inline Heap<T, Comp>::Heap(int size) : vec(size)
+template<class T, class Comp> inline heap<T, Comp>::heap(int size) : vec(size)
 {
 }
 
-template<class T, class Comp> inline Heap<T, Comp>::Heap() : vec()
+template<class T, class Comp> inline heap<T, Comp>::heap() : vec()
 {
 }
 
-template<class T, class Comp> bool Heap<T, Comp>::remove()
+template<class T, class Comp> bool heap<T, Comp>::remove()
 {
    if (vec.empty()) {
 
@@ -165,7 +173,7 @@ template<class T, class Comp> bool Heap<T, Comp>::remove()
    return true;
 }
 
-template<class T, class Comp> void Heap<T, Comp>::swim(int index)
+template<class T, class Comp> void heap<T, Comp>::swim(int index)
 {
     // Move new item up until we have a valid heap
     int parentIndex;
@@ -186,7 +194,7 @@ template<class T, class Comp> void Heap<T, Comp>::swim(int index)
         }
     }
 }
-template<class T, class Comp> void Heap<T, Comp>::add(int x, const T& t)
+template<class T, class Comp> void heap<T, Comp>::add(int x, const T& t)
 {
     vec.push_back(Node(x, t)); 
 
@@ -199,7 +207,7 @@ template<class T, class Comp> void Heap<T, Comp>::add(int x, const T& t)
  * Move the new root downward until we have a valid heap.
  */
  
-template<class T, class Comp> inline void Heap<T, Comp>::sink(int root)
+template<class T, class Comp> inline void heap<T, Comp>::sink(int root)
 {
   int child = 2 * root + 1; // Determine if root is a leaf.
 
