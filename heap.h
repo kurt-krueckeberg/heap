@@ -325,6 +325,8 @@ template<class T, class Comp> inline void heap<T, Comp>::sink(int root)
 
 template<typename T, typename Comp> int  heap<T, Comp>::height() const noexcept
 {
+   if (size == 0) return 0;
+
    int log = std::log2(size);  
         
    return log + 1;

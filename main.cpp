@@ -33,7 +33,7 @@ int main(int argc, char** argv)
         
          h.add(priority, dble);
 
-         cout << "printing heap:\n";
+         cout << "\nprinting heap:";
 
          cout << h; 
     }
