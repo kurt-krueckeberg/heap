@@ -31,14 +31,18 @@ template<class T, class Comp> class heap {
         int priority;
         T   data;    
         */
-        std::pair<int, T> pair;
+        union {
+          std::pair<int, T> pair;
+          std::pair<const int, T> constkey_pair;
+          const std::pair<int, T> const_pair;
+        };
        
-         
+        constexpr const std::pair<int, T>& getPair() const noexcept
+        { 
+          return const_pair; 
+        }
+
       public: 
-        /*
-         TODO: Add value_type typedef/using 
-         using value_type = std::pair<int, T>l 
-         */
                
         Node(int pr, const T& t) : pair{pr, t} {}
 
@@ -63,7 +67,7 @@ template<class T, class Comp> class heap {
          
         T& getData() noexcept
         { 
-            return pair.seconda; 
+            return pair.second; 
         }
 
         const int& getPriority() const noexcept 
@@ -154,7 +158,9 @@ template<class T, class Comp> class heap {
     int size;
 
     public:   
-        
+
+     using value_type = std::pair<int, T>; // or 'const std::pair<int, T>' or 'std::pair<const int, T>'
+   
      heap(int size);
      heap();
      
@@ -176,12 +182,100 @@ template<class T, class Comp> class heap {
     
      std::ostream& printLevelOrder(std::ostream&) const noexcept;
      
-     // implement heap iterator
-     class iterator : public std::iterator<std::bidirectional_iterator_tag, typename heap<T, Comp>::value_type> { 
-        public:
-     };
-     
-     iterator begin() const noexcept;
+class iterator : public std::iterator<std::bidirectional_iterator_tag, typename heap<T, Comp>::value_type> { 
+                                                 
+         friend class heap<T, Comp>;   
+
+         heap<T, Comp>& heap_; 
+
+         std::vector<heap<T, Comp>::Node>::iterator vec_iter;
+
+         iterator& increment() noexcept; 
+
+         iterator& decrement() noexcept;
+
+         iterator(heap<T, Comp>& lhs, int i);  // called by end()   
+
+         constexpr reference dereference() noexcept 
+         { 
+             return vec_iter->constkey_pair;
+         } 
+
+      public:
+
+         explicit iterator(heap<T, Comp>&); 
+
+         iterator(const iterator& lhs); // What does explicit do?
+
+         iterator(iterator&& lhs); 
+ 
+         bool operator==(const iterator& lhs) const;
+         
+         constexpr bool operator!=(const iterator& lhs) const { return !operator==(lhs); }
+
+         constexpr const std::pair<int, T>& dereference() const noexcept 
+         { 
+             return vec_iter->const_pair; 
+         }
+         
+         iterator& operator++() noexcept; 
+         iterator operator++(int) noexcept;
+
+         iterator& operator--() noexcept;
+         iterator operator--(int) noexcept;
+         
+         std::pair<const int, T>& operator*() noexcept { return dereference(); } 
+
+         const std::pair<const T, Comp>& operator*() const noexcept { return dereference(); }
+         
+         typename heap<T, Comp>::KeyValue *operator->() noexcept;
+    };
+
+    class const_iterator : public std::iterator<std::bidirectional_iterator_tag, const value_type> {
+
+       friend class heap<T, Comp>;   
+
+      private:
+        iterator iter; 
+         explicit const_iterator(const heap<T, Comp>& lhs, int i);
+      public:
+         
+         explicit const_iterator(const heap<T, Comp>& lhs);
+
+         const_iterator(const const_iterator& lhs);
+         const_iterator(const_iterator&& lhs); 
+
+         const_iterator(const typename heap<T, Comp>::iterator& lhs); // this ctor provide implicit conversion from iterator to const_iterator     
+
+         bool operator==(const const_iterator& lhs) const;
+         bool operator!=(const const_iterator& lhs) const;
+         
+         const_iterator& operator++() noexcept;
+         const_iterator operator++(int) noexcept;
+         const_iterator& operator--() noexcept;
+         const_iterator operator--(int) noexcept;
+
+         const std::pair<const Key,Value>&  operator*() const noexcept 
+         {
+           return iter.dereference(); 
+         } 
+
+         const std::pair<const T, Comp> *operator->() const noexcept { return &this->operator*(); } 
+    };
+
+    iterator begin() noexcept;  
+    iterator end() noexcept;  
+  
+    const_iterator begin() const noexcept;  
+    const_iterator end() const noexcept;  
+  
+    using  reverse_iterator       = std::reverse_iterator<typename heap<T, Comp>::iterator>; 
+    using  const_reverse_iterator = std::reverse_iterator<typename heap<T, Comp>::const_iterator>;
+
+    reverse_iterator rbegin() noexcept;  
+    reverse_iterator rend() noexcept;  
+ 
+
 };
 
 template<class T, class Comp> std::ostream& heap<T, Comp>::printLevelOrder(std::ostream& ostr) const noexcept
