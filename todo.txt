@@ -1,2 +1,5 @@
-finish levelOrderPrint()
-Test min_heap.
+1. Implemnt levelOrderTraverse() to use an iterator. To implement the iterator class modelled after tree234, I first need to change heap to have a value_type that should be std::pair<int, T>. This will force the other existing
+methods to be changed slightly. So first test the code after adding the std::pair<int, T> and then after adding the iterator.
+
+
+2. Test min_heap using the method printLevelOrder().

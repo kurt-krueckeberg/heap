@@ -6,19 +6,36 @@
 #include <iterator>
 #include <algorithm>
 #include <vector>
+#include <queue>
 #include <exception>
+#include <cmath>
 /*
  * Generic heaps that works as max heap and min heap. i.e., 
  * using max_heap = heap<double> // heap<double, less<int>>
  * using min_heap = heap<double, greater<int>>
  */
-template<class T, class Comp=std::less<int> > class heap {
+
+template<class T, class Comp=std::less<int> > class heap; 
+template<class T> class max_heap : public heap<T>  {}; 
+template<class T> class min_heap : public heap<T, std::greater<T>>  {}; 
+
+//-template<class T, class Comp=std::less<int> > class heap {
+template<class T, class Comp> class heap {
   
     class Node {
+        
         friend class heap<T, Comp>;
+
+         // TODO: Make this a std::pair<int, T>  
         int priority;
-        T   data;     
+        T   data;    
+        
       public: 
+        /*
+         TODO: Add value_type typedef/using 
+         using value_type = std::pair<int, T>l 
+         */
+               
         Node(int pr, const T& t) : priority(pr), data(t) {}
 
         Node(const Node& n) : priority(n.priority), data(n.data)
@@ -30,6 +47,7 @@ template<class T, class Comp=std::less<int> > class heap {
         }
 
         Node& operator=(const Node& n);
+        
         Node& operator=(Node&& n);
          
         const T& getData() const 
@@ -47,20 +65,60 @@ template<class T, class Comp=std::less<int> > class heap {
             return priority; 
         } 
     
-        friend std::ostream& operator<<(std::ostream& ostr, const Node& rhs)
+        std::ostream& print(std::ostream& ostr) const noexcept
         {
-            ostr << "[Priority: " << rhs.getPriority() << "; Data: " << rhs.getData() << "]";
-            return ostr;
+          return  ostr << "[Priority: " << getPriority() << "; Data: " << getData() << "]";
+        } 
+
+        friend std::ostream& operator<<(std::ostream& ostr, const Node& node)
+        {
+            return node.print(node);
         }
     };
 
-    std::vector<Node> vec;
-    Comp compare_functor;
+    class NodeLevelOrderPrinter {
+  
+        std::ostream& ostr;
+        int current_level;
+        int height;
+  
+        void display_level(std::ostream& ostr, int level) const noexcept
+        {
+          ostr << "\n\n" << "current_level = " <<  current_level << ' '; 
+             
+          // Provide some basic spacing to tree appearance.
+          std::size_t num = height - current_level + 1;
+          
+          std::string str( num, ' ');
+          
+          ostr << str; 
+        }
+  
+       public: 
+          
+       NodeLevelOrderPrinter (int hght,  std::ostream& (Node::*pmf_)(std::ostream&) const noexcept, std::ostream& ostr_in): height{hght}, ostr{ostr_in}, current_level{0} {}
+  
+       NodeLevelOrderPrinter (const NodeLevelOrderPrinter& lhs): height{lhs.height}, ostr{lhs.ostr}, current_level{lhs.current_level} {}
+  
+       void operator ()(const Node *pnode, int level)
+       { 
+           // Did current_level change?
+           if (current_level != level) { 
+          
+               current_level = level;
+          
+               display_level(ostr, level);       
+           }
+  
+           std::cout << *pnode << ' ' << std::flush;
+       }
+    };
 
     bool compare(const Node& lhs, const Node& rhs)
     {
        return compare_functor(lhs.priority, rhs.priority);		
     }	
+
     /* 
      * bottom-up repair of heap property ("swim up"). Continues to swap the value in index pos with the parent until parent is not less than vec[pos].
      * until we again have a valid heap. 
@@ -79,31 +137,41 @@ template<class T, class Comp=std::less<int> > class heap {
        return left_child >= vec.size() ? true : false; 
     }  
 
+    std::vector<Node> vec;
+    Comp compare_functor;
+    
+    int size;
+
     public:   
         
      heap(int size);
      heap();
+     
      bool isEmpty() const;
+     
      T peekTop() const;
+     
      void add(int priority, const T& t);
+     
      bool remove();
+     
      void clear();
+     
+     int height() const noexcept;
+     
+     template<typename Functor> void levelOrderTraverse(Functor f) const noexcept;
     
-    friend std::ostream&  operator<<(std::ostream&  ostr, const heap& heap)  
-    {
-     std::ostream_iterator<typename heap::Node> out_it(ostr, ", ");
-
-     std::copy(heap.vec.begin(), heap.vec.end(), out_it);
-
-     return ostr;
-    }
+     std::ostream&  operator<<(std::ostream&  ostr, const heap& heap);
     
-    std::ostream& printLevelOrder(std::ostream&) const noexcept;
+     std::ostream& printLevelOrder(std::ostream&) const noexcept;
+     
+     // implement heap iterator
+     class iterator : public std::iterator<std::bidirectional_iterator_tag, typename heap<T, Comp>::value_type> { 
+        public:
+     };
+     
+     iterator begin() const noexcept;
 };
-
-
-template<class T> class max_heap : public heap<T>  {}; 
-template<class T> class min_heap : public heap<T, std::greater<T>>  {}; 
 
 template<class T, class Comp> std::ostream& heap<T, Comp>::printLevelOrder(std::ostream& ostr) const noexcept
 {
@@ -148,11 +216,11 @@ template<class T, class Comp> T heap<T, Comp>::peekTop() const
    }
 }
 
-template<class T, class Comp> inline heap<T, Comp>::heap(int size) : vec(size)
+template<class T, class Comp> inline heap<T, Comp>::heap(int sz) : vec(sz), size{0} 
 {
 }
 
-template<class T, class Comp> inline heap<T, Comp>::heap() : vec()
+template<class T, class Comp> inline heap<T, Comp>::heap() : vec(), size{0}
 {
 }
 
@@ -162,6 +230,8 @@ template<class T, class Comp> bool heap<T, Comp>::remove()
 
        return false;
    }
+
+   --size;
      
    // put last item in root
    vec[0] = vec[vec.size() - 1];
@@ -194,8 +264,11 @@ template<class T, class Comp> void heap<T, Comp>::swim(int index)
         }
     }
 }
+
 template<class T, class Comp> void heap<T, Comp>::add(int x, const T& t)
 {
+    ++size;
+
     vec.push_back(Node(x, t)); 
 
     int index = vec.size() - 1;
@@ -230,4 +303,60 @@ template<class T, class Comp> inline void heap<T, Comp>::sink(int root)
       }  
   }
 }
+
+template<typename T, typename Comp> int  heap<T, Comp>::height() const noexcept
+{
+  auto log = std::log2(size);  
+  
+  if (size == std::pow(2, log))  {
+      
+      return log;
+      
+  } else {
+      
+      return std::ceil(log);
+  }
+}
+
+/*
+ * F is a functor whose function call operator takes two parameters: a Node * and an int indicating the depth of the node from the root, which has depth 1.
+ */
+template<typename T, typename Comp> template<typename Functor> void heap<T, Comp>::levelOrderTraverse(Functor f) const noexcept
+{
+   if (size == 0) return;
+   
+   // pair of: 1. Node pointer and 2. level of tree.
+   std::queue<std::pair<const Node*, int>> q; 
+
+   auto level = 1;
+
+      q.push(std::make_pair(peekTop(), level));  // 
+
+   while (!q.empty()) {
+
+        auto [pnode, tree_level] = q.front(); // uses C++17 unpacking
+
+        f(pnode, tree_level); // For example: print out all the keys_values in pnode.
+         
+        if (!pnode->is_leaf()) {
+                        
+            for(auto i = 0; i < pnode->getChildCount(); ++i) {
+
+               q.push(std::make_pair(pnode->children[i].get(), tree_level + 1));  
+            }
+            
+        }
+        q.pop(); 
+   }
+}
+
+template<typename T, typename Comp> void heap<T, Comp>::printlevelOrder(std::ostream& ostr) const noexcept
+{
+  NodeLevelOrderPrinter tree_printer(height(), (&Node::print), ostr);  
+  
+  levelOrderTraverse(tree_printer);
+  
+  ostr << std::flush;
+}
+
 #endif	
