@@ -11,10 +11,18 @@
 
 using namespace std;
 
+int height(int size) 
+{
+  int log = std::log2(size);  
+        
+  return log + 1;
+  
+}
+
+
 int main(int argc, char** argv) 
 {
-    heap<double> h;
-    heap<double> h2; // TODO: try min_heap<double> h2
+    heap<double> h; // TODO: try min_heap<double> h
     
     for (auto i = 10; i < 120;  i += 10) {
         
@@ -23,17 +31,21 @@ int main(int argc, char** argv)
         
         int priority = i;
         
-         h2.add(priority, dble);
+         h.add(priority, dble);
+
+         cout << "printing heap:\n";
+
+         cout << h; 
     }
     
     double d;
     
-    while (!h2.isEmpty()) {
+    while (!h.isEmpty()) {
         
-        d = h2.peekTop();
+        d = h.peekTop();
         cout << "The top of the heap was: " << d << endl;
-        h2.remove();
-        cout << "Heap is: " <<  h2 << endl;
+        h.remove();
+        cout << "Heap is: " <<  h << endl;
     }
      
     
