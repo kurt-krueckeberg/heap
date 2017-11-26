@@ -36,16 +36,12 @@ int main(int argc, char** argv)
          
          cout << "\n\nPrinting heap"; 
          
-          h.print_heap_priorities(cout); 
+          h.print_heap(cout); 
     }
     
     cout << "\n";
     
-    for(auto iter = h.begin(); iter != h.end(); ++iter) {
-
-        cout << iter->first << ", ";
-    }
-    
+    cout << h;
     cout << endl;
     
     double d;
