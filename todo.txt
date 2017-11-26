@@ -1,2 +1,0 @@
-1.New code is not working. Could also be a bug in print code.
-2. Test min_heap using the method printLevelOrder().

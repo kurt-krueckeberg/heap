@@ -81,12 +81,12 @@ template<class T, class Comp> class heap {
         
         friend bool operator>(const Node& lhs, const Node& rhs)
         {
-            return lhs.getPriority() > rhs.getPriority(); // Notice that operands are reversed.
+            return lhs.getPriority() > rhs.getPriority(); 
         }    
 
         std::ostream& print(std::ostream& ostr) const noexcept
         {          
-          return  ostr << '[' << getPriority() << ']' << std::endl;
+          return  ostr << '[' << getPriority() << ", " << getData() << ']' << std::flush;
         } 
 
         friend std::ostream& operator<<(std::ostream& ostr, const Node& node)
@@ -102,8 +102,8 @@ template<class T, class Comp> class heap {
 
     bool compare(const Node& lhs, const Node& rhs)
     {
-       return lhs.getPriority() < rhs.getPriority();		
-       //--return compare_functor(lhs.getPriority(), rhs.getPriority());		
+       //--return lhs.getPriority() < rhs.getPriority();		
+       return compare_functor(lhs.getPriority(), rhs.getPriority());		
     }	
 
     /* 
@@ -158,6 +158,8 @@ template<class T, class Comp> class heap {
      int height() const noexcept;
      
      void print_heap(std::ostream&) const noexcept; 
+
+     void print_heap_priorities(std::ostream&) const noexcept; 
 
      void show_level(int height, int level, std::ostream& ostr) const noexcept; 
 
@@ -320,11 +322,39 @@ template<typename T, typename Comp> void heap<T, Comp>::print_heap(std::ostream&
            show_level(tree_height, level, ostr);  
         }  
                 
-        ostr << '[' << vec[pos].getPriority() << ']' << "  "; 
+        ostr << vec[pos] << "  ";
         
         ++pos;
    }
 }
+
+template<typename T, typename Comp> void heap<T, Comp>::print_heap_priorities(std::ostream& ostr) const noexcept
+{
+   if (size == 0) return;
+
+   int tree_height = height(); 
+  
+   auto level = 0;
+
+   int pos = 0;
+  
+   while (pos < size) {
+ 
+        int tree_level = static_cast<int>(log2(pos + 1) + 1);
+
+        if (level != tree_level) {
+
+           level = tree_level;
+
+           show_level(tree_height, level, ostr);  
+        }  
+                
+        ostr << '[' << vec[pos].getPriority() << "]  " << std::flush;
+        
+        ++pos;
+   }
+}
+
 
 template<class T, class Comp> void heap<T, Comp>::show_level(int height, int current_level, std::ostream& ostr) const noexcept
 {

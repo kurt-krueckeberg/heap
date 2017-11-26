@@ -23,7 +23,7 @@ int height(int size)
 
 int main(int argc, char** argv) 
 {
-    heap<double> h; // TODO: try min_heap<double> h
+    min_heap<double> h; // TODO: try min_heap<double> h
     
     for (auto i = 10; i < 120;  i += 10) {
         
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
          
          cout << "\n\nPrinting heap"; 
          
-         cout << h; 
+          h.print_heap_priorities(cout); 
     }
     
     double d;
@@ -44,8 +44,11 @@ int main(int argc, char** argv)
     while (!h.isEmpty()) {
         
         d = h.peekTop();
-        cout << "The top of the heap was: " << d << endl;
+
+        cout << "\nThe top of the heap was: " << d << endl;
+
         h.remove();
+
         cout << "Heap is: " <<  h << endl;
     }
      
