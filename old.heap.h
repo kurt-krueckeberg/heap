@@ -28,24 +28,20 @@ template<class T, class Comp> class heap {
 
         union {
            std::pair<int, T> pair;
+           //--std::pair<const int, T> constkey_pair;
            const std::pair<int, T> const_pair;
         };
        
         constexpr const std::pair<int, T>& getPair() const noexcept
         { 
           return const_pair; 
-        } 
-
-        constexpr std::pair<int, T>& getPair() noexcept
-        { 
-          return pair; 
         }
 
       public: 
                
-        Node(int priority, const T& t) : pair{priority, t} {}
+        Node(int pr, const T& t) : pair{pr, t} {}
 
-        Node(int priority, T&& t) : pair{priority, std::move(t)} {}
+        Node(int pr, T&& t) : pair{pr, std::move(t)} {}
 
         Node(const Node& n) : pair{n.pair}
         {
@@ -73,20 +69,10 @@ template<class T, class Comp> class heap {
         { 
             return pair.first; 
         } 
-       
-        friend bool operator<(const Node& lhs, const Node& rhs)
-        { 
-            return lhs.getPriority() < rhs.getPriority();
-        }
-        
-        friend bool operator>(const Node& lhs, const Node& rhs)
-        {
-            return lhs.getPriority() > rhs.getPriority(); // Notice that operands are reversed.
-        }    
-
+    
         std::ostream& print(std::ostream& ostr) const noexcept
         {
-          return  ostr << "[ " << getPriority() << "]";
+          return  ostr << "[Priority: " << getPriority() << "; Data: " << getData() << "]";
         } 
 
         friend std::ostream& operator<<(std::ostream& ostr, const Node& node)
@@ -140,8 +126,7 @@ template<class T, class Comp> class heap {
 
     bool compare(const Node& lhs, const Node& rhs)
     {
-       return lhs.getPriority() < rhs.getPriority();		
-       //--return compare_functor(lhs.getPriority(), rhs.getPriority());		
+       return compare_functor(lhs.getPriority(), rhs.getPriority());		
     }	
 
     /* 

@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <cmath>
 #include "heap.h"
 
 using namespace std;
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
 
          cout << "\nprinting heap:";
 
-         cout << h; 
+         //--cout << h; 
     }
     
     double d;
