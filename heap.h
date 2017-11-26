@@ -102,7 +102,6 @@ template<class T, class Comp> class heap {
 
     bool compare(const Node& lhs, const Node& rhs)
     {
-       //--return lhs.getPriority() < rhs.getPriority();		
        return compare_functor(lhs.getPriority(), rhs.getPriority());		
     }	
 
@@ -214,23 +213,16 @@ template<class T, class Comp> inline heap<T, Comp>::heap() : vec(), size{0}
 {
 }
 
-template<class T, class Comp> bool heap<T, Comp>::remove()
+
+template<class T, class Comp> void heap<T, Comp>::add(int x, const T& t)
 {
-   if (vec.empty()) {
+    ++size;
 
-       return false;
-   }
+    vec.push_back(Node(x, t)); 
 
-   --size;
-     
-   // put last item in root
-   vec[0] = vec[vec.size() - 1];
-           
-   vec.pop_back(); // then remove the formerly last item
+    int index = vec.size() - 1;
 
-   sink(0);  // repair heap property
-
-   return true;
+    swim(index); // repair heap property
 }
 
 template<class T, class Comp> void heap<T, Comp>::swim(int index)
@@ -255,17 +247,24 @@ template<class T, class Comp> void heap<T, Comp>::swim(int index)
     }
 }
 
-template<class T, class Comp> void heap<T, Comp>::add(int x, const T& t)
+template<class T, class Comp> bool heap<T, Comp>::remove()
 {
-    ++size;
+   if (vec.empty()) {
 
-    vec.push_back(Node(x, t)); 
+       return false;
+   }
 
-    int index = vec.size() - 1;
+   --size;
+     
+   // put last item in root
+   vec[0] = vec[vec.size() - 1];
+           
+   vec.pop_back(); // then remove the formerly last item
 
-    swim(index); // repair heap property
+   sink(0);  // repair heap property
+
+   return true;
 }
-
 /*
  * Move the new root downward until we have a valid heap.
  */
@@ -363,7 +362,7 @@ template<class T, class Comp> void heap<T, Comp>::show_level(int height, int cur
   // Provide some basic spacing to tree appearance.
   std::size_t num = height - current_level + 1;
   
-  std::string str( num, ' ');
+  std::string str(num, ' ');
   
   ostr << str << std::flush; 
 }
