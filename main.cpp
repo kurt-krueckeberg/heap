@@ -39,6 +39,15 @@ int main(int argc, char** argv)
           h.print_heap_priorities(cout); 
     }
     
+    cout << "\n";
+    
+    for(auto iter = h.begin(); iter != h.end(); ++iter) {
+
+        cout << iter->first << ", ";
+    }
+    
+    cout << endl;
+    
     double d;
     
     while (!h.isEmpty()) {

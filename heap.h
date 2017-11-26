@@ -28,17 +28,17 @@ template<class T, class Comp> class heap {
 
         union {
            std::pair<int, T> pair;
-           const std::pair<int, T> const_pair;
+           std::pair<const int, T> constkey_pair;
         };
        
-        constexpr const std::pair<int, T>& getPair() const noexcept
+        constexpr const std::pair<const int, T>& getPair() const noexcept
         { 
-          return const_pair; 
+          return constkey_pair; 
         } 
 
-        constexpr std::pair<int, T>& getPair() noexcept
+        constexpr std::pair<const int, T>& getPair() noexcept
         { 
-          return pair; 
+          return constkey_pair; 
         }
 
       public: 
@@ -139,7 +139,8 @@ template<class T, class Comp> class heap {
 
     public:   
 
-     using value_type = std::pair<int, T>; // or 'const std::pair<int, T>' or 'std::pair<const int, T>'
+     using value_type = std::pair<const int, T>; 
+     using reference = std::pair<const int, T>&; 
    
      heap(int size);
      heap();
@@ -167,9 +168,173 @@ template<class T, class Comp> class heap {
          lhs_heap.print_heap(ostr);
          return ostr;
      }
+
+     class iterator : public std::iterator<std::bidirectional_iterator_tag, typename heap<T, Comp>::value_type> { 
+                                                 
+       friend class heap;   
+
+      private:
+
+         typename std::vector<Node>::iterator iter; 
+
+         iterator& increment() noexcept; 
+
+         iterator(heap& lhs, int i) : iter{lhs.vec.end()} 
+         {
+
+         }
          
-};
+         typename heap<T, Comp>::reference dereference() const noexcept
+         {
+             return iter->getPair();
+         }
+        
+      public:
+
+         explicit iterator(heap& lhs) : iter{lhs.vec.begin()} 
+         {
+         }   
+
+         iterator(const iterator& lhs) : iter{lhs.iter}
+         {
+         }
+
+         iterator(iterator&& lhs); 
  
+         bool operator==(const iterator& lhs) const
+         {
+            return iter == lhs.iter; 
+         } 
+         
+         constexpr bool operator!=(const iterator& lhs) const { return !operator==(lhs); }
+
+         constexpr std::pair<const int, T>& operator*() noexcept 
+         { 
+            return this->dereference();
+         }
+         
+         iterator& operator++() noexcept
+         {
+           ++iter; 
+           return *this; 
+         }  
+
+         iterator operator++(int) noexcept
+         {
+           iterator tmp{*this};
+           
+           operator++(); 
+
+           return tmp; 
+         }  
+ 
+         iterator& operator--() noexcept
+         {
+           --iter; 
+           return *this; 
+         }  
+
+         iterator operator--(int) noexcept
+         {
+           iterator tmp{*this};
+           
+           operator--(); 
+
+           return tmp; 
+         }  
+
+         constexpr std::pair<const int, T>  *operator->() noexcept
+         {
+            &operator*(); 
+         }
+
+    };
+
+   class const_iterator : public std::iterator<std::bidirectional_iterator_tag, const value_type> {                                                  
+
+       friend class heap;   
+
+      private:
+
+         typename std::vector<Node>::const_iterator iter; 
+
+         const_iterator(const heap& lhs, int i) : iter{lhs.vec.end()} 
+         {
+
+         }
+         
+         const typename heap<T, Comp>::value_type& dereference() const noexcept
+         {
+             return iter->getPair();
+         }
+        
+      public:
+
+         explicit const_iterator(const heap& lhs) : iter{lhs.vec.begin()} 
+         {
+         }   
+
+         const_iterator(const const_iterator& lhs) : iter{lhs.iter}
+         {
+         }
+
+         const_iterator(iterator&& lhs); 
+ 
+         bool operator==(const const_iterator& lhs) const
+         {
+            return iter == lhs.iter; 
+         } 
+         
+         constexpr bool operator!=(const const_iterator& lhs) const { return !operator==(lhs); }
+
+         constexpr const std::pair<const int, T>& operator*() noexcept 
+         { 
+            return this->dereference();
+         }
+         
+         const_iterator& operator++() noexcept
+         {
+           ++iter; 
+           return *this; 
+         }  
+
+         const_iterator operator++(int) noexcept
+         {
+           const_iterator tmp{*this};
+           
+           operator++(); 
+
+           return tmp; 
+         }  
+ 
+         const_iterator& operator--() noexcept
+         {
+           --iter; 
+           return *this; 
+         }  
+
+         const_iterator operator--(int) noexcept
+         {
+           const_iterator tmp{*this};
+           
+           operator--(); 
+
+           return tmp; 
+         }  
+
+         constexpr std::pair<const int, T>  *operator->() noexcept
+         {
+            &operator*(); 
+         }
+    };     
+
+    iterator begin() noexcept;  
+    iterator end() noexcept;  
+
+    const_iterator begin() const noexcept;  
+    const_iterator end() const noexcept;  
+};
+
 template<class T, class Comp> typename heap<T, Comp>::Node& heap<T, Comp>::Node::operator=(const typename heap<T, Comp>::Node& n)
 {
    if (this != &n) { 
@@ -336,24 +501,22 @@ template<typename T, typename Comp> void heap<T, Comp>::print_heap_priorities(st
    auto level = 0;
 
    int pos = 0;
-  
-   while (pos < size) {
+   
+   for (auto iter = begin();iter != end(); ++iter) {
  
-        int tree_level = static_cast<int>(log2(pos + 1) + 1);
+        int current_level = static_cast<int>(log2(pos++ + 1) + 1);
 
-        if (level != tree_level) {
+        if (level != current_level) {
 
-           level = tree_level;
+           level = current_level;
 
            show_level(tree_height, level, ostr);  
         }  
                 
-        ostr << '[' << vec[pos].getPriority() << "]  " << std::flush;
+        ostr << '[' << iter->first << "]  " << std::flush;
         
-        ++pos;
-   }
+    }
 }
-
 
 template<class T, class Comp> void heap<T, Comp>::show_level(int height, int current_level, std::ostream& ostr) const noexcept
 {
@@ -365,5 +528,26 @@ template<class T, class Comp> void heap<T, Comp>::show_level(int height, int cur
   std::string str(num, ' ');
   
   ostr << str << std::flush; 
+} 
+
+
+template<class T, class Comp> inline typename heap<T, Comp>::iterator heap<T, Comp>::begin() noexcept
+{
+  return iterator{*this};
+}
+
+template<class T, class Comp> inline typename heap<T, Comp>::iterator heap<T, Comp>::end() noexcept
+{
+   return iterator{*this, 0};
+}
+
+template<class T, class Comp> inline typename heap<T, Comp>::const_iterator heap<T, Comp>::begin() const noexcept
+{
+  return const_iterator{*this};
+}
+
+template<class T, class Comp> inline typename heap<T, Comp>::const_iterator heap<T, Comp>::end() const noexcept
+{
+   return const_iterator{*this, 0};
 }
 #endif	
