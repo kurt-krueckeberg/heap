@@ -353,14 +353,15 @@ template<typename T, typename Comp> template<typename Functor> void heap<T, Comp
         auto [pnode, tree_level] = q.front(); // uses C++17 unpacking
 
         f(pnode, tree_level); // For example: print out all the keys_values in pnode.
-         
-        if (!is_leaf(pos)) {
+        
+        int left_child = leftChild(pos);                        
 
-           int left = leftChild(pos);                      
-           int right = rightChild(pos);
+        if (left_child < size) {
 
-           q.push(std::make_pair(&vec[left], tree_level + 1));  
-           q.push(std::make_pair(&vec[right], tree_level + 1));  
+           int right_child = rightChild(pos);
+
+           q.push(std::make_pair(&vec[left_child], tree_level + 1));  
+           q.push(std::make_pair(&vec[right_child], tree_level + 1));  
         }
         q.pop(); 
    }

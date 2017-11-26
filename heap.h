@@ -85,52 +85,14 @@ template<class T, class Comp> class heap {
         }    
 
         std::ostream& print(std::ostream& ostr) const noexcept
-        {
-          return  ostr << "[ " << getPriority() << "]";
+        {          
+          return  ostr << '[' << getPriority() << ']' << std::endl;
         } 
 
         friend std::ostream& operator<<(std::ostream& ostr, const Node& node)
         {
             return node.print(ostr);
         }
-    };
-
-    class NodeLevelOrderPrinter {
-  
-        std::ostream& ostr;
-        int current_level;
-        int height;
-  
-        void display_level(std::ostream& ostr, int level) const noexcept
-        {
-          ostr << "\n\n" << "current_level = " <<  current_level << ' '; 
-             
-          // Provide some basic spacing to tree appearance.
-          std::size_t num = height - current_level + 1;
-          
-          std::string str( num, ' ');
-          
-          ostr << str; 
-        }
-  
-       public: 
-          
-       NodeLevelOrderPrinter (int height_in, std::ostream& ostr_in): height{height_in}, ostr{ostr_in}, current_level{0} {}
-  
-       NodeLevelOrderPrinter (const NodeLevelOrderPrinter& lhs): height{lhs.height}, ostr{lhs.ostr}, current_level{lhs.current_level} {}
-  
-       void operator()(const Node *pnode, int level)
-       { 
-           // Did current_level change?
-           if (current_level != level) { 
-          
-               current_level = level;
-          
-               display_level(ostr, level);       
-           }
-  
-           std::cout << *pnode << ' ' << std::flush;
-       }
     };
 
     std::vector<Node> vec;
@@ -195,26 +157,18 @@ template<class T, class Comp> class heap {
      
      int height() const noexcept;
      
-     std::ostream& printLevelOrder(std::ostream& ostr) const noexcept;
-     
-     template<typename Functor> void levelOrderTraverse(Functor f) const noexcept;
-     
-     friend std::ostream&  operator<<(std::ostream&  ostr, const heap& lhs_heap)
+     void print_heap(std::ostream&) const noexcept; 
+
+     void show_level(int height, int level, std::ostream& ostr) const noexcept; 
+
+     friend std::ostream&  operator<<(std::ostream&  ostr, const heap& lhs_heap) 
      {
-         return lhs_heap.printLevelOrder(ostr);
+         lhs_heap.print_heap(ostr);
+         return ostr;
      }
          
 };
-                                    
-template<class T, class Comp> std::ostream& heap<T, Comp>::printLevelOrder(std::ostream& ostr) const noexcept
-{
-  NodeLevelOrderPrinter tree_printer(height(), ostr);  
-  
-  levelOrderTraverse(tree_printer);
-  
-  ostr << std::flush;
-}
-
+ 
 template<class T, class Comp> typename heap<T, Comp>::Node& heap<T, Comp>::Node::operator=(const typename heap<T, Comp>::Node& n)
 {
    if (this != &n) { 
@@ -342,42 +296,45 @@ template<typename T, typename Comp> int  heap<T, Comp>::height() const noexcept
 {
    if (size == 0) return 0;
 
-   int log = std::log2(size);  
-        
-   return log + 1;
+   return static_cast<int>(std::log2(size + 1));  
 }
 
-/*
- * F is a functor whose function call operator takes two parameters: a 'const Node *' and an int indicating the depth of the node from the root, which has depth 1.
- */
-template<typename T, typename Comp> template<typename Functor> void heap<T, Comp>::levelOrderTraverse(Functor f) const noexcept
+template<typename T, typename Comp> void heap<T, Comp>::print_heap(std::ostream& ostr) const noexcept
 {
    if (size == 0) return;
-   
-   // pair of: 1. Node pointer and 2. level of tree.
-   std::queue<std::pair<const Node*, int>> q; 
 
-   auto level = 1;
+   int tree_height = height(); 
+  
+   auto level = 0;
 
    int pos = 0;
+  
+   while (pos < size) {
+ 
+        int tree_level = static_cast<int>(log2(pos + 1) + 1);
 
-   q.push(std::make_pair(&vec[pos], level)); 
+        if (level != tree_level) {
 
-   while (!q.empty()) {
+           level = tree_level;
 
-        auto [pnode, tree_level] = q.front(); // uses C++17 unpacking
-
-        f(pnode, tree_level); // For example: print out all the keys_values in pnode.
-         
-        if (!is_leaf(pos)) {
-
-           int left = leftChild(pos);                      
-           int right = rightChild(pos);
-
-           q.push(std::make_pair(&vec[left], tree_level + 1));  
-           q.push(std::make_pair(&vec[right], tree_level + 1));  
-        }
-        q.pop(); 
+           show_level(tree_height, level, ostr);  
+        }  
+                
+        ostr << '[' << vec[pos].getPriority() << ']' << "  "; 
+        
+        ++pos;
    }
+}
+
+template<class T, class Comp> void heap<T, Comp>::show_level(int height, int current_level, std::ostream& ostr) const noexcept
+{
+  ostr << "\n\n" << "current_level = " <<  current_level << ' '; 
+     
+  // Provide some basic spacing to tree appearance.
+  std::size_t num = height - current_level + 1;
+  
+  std::string str( num, ' ');
+  
+  ostr << str << std::flush; 
 }
 #endif	
