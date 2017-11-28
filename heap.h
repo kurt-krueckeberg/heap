@@ -106,14 +106,13 @@ template<class T, class Comp> class heap {
     }	
 
     /* 
-     * bottom-up repair of heap property ("swim up"). Continues to swap the value in index pos with the parent until parent is not less than vec[pos].
+     * bottom-up repair of heap property ("swim up"). Continues to swap the value at vec[pos] with its parent until the parent's priority >= than vec[pos].getPriority().
      * until we again have a valid heap. 
      */ 
     void swim(int pos); 
     
     /*
-     * top-down reheapify. Move the value in index pos downward ("sink down"), if necessary, until we again 
-     * have a valid heap        
+     * top-down reheapify. Move the value at vec[pos] downward ("sink down"), if necessary, until the 'priority of parent of vec[pos]' is >= vec[pos].getPriority().        
      */
     void sink(int pos); 
 
@@ -254,38 +253,39 @@ template<class T, class Comp> bool heap<T, Comp>::remove()
 
    --size;
      
-   // put last item in root
+   // Copy the last item to the root position
    vec[0] = vec[vec.size() - 1];
            
-   vec.pop_back(); // then remove the formerly last item
+   vec.pop_back(); // and then remove the last time
 
-   sink(0);  // repair heap property
+   sink(0);  // restore heap property
 
    return true;
 }
 /*
- * Move the new root downward until we have a valid heap.
+ * Recursively swap's the root of the subtree with its smallest child (largest child in the case of a min heap). Recursion stops when there are no more children
+ * or as soon as the heap property has been restored.
  */
  
 template<class T, class Comp> inline void heap<T, Comp>::sink(int root)
 {
-  int child = 2 * root + 1; // Determine if root is a leaf.
+  int child = 2 * root + 1; // Is root a leaf?
 
-  if (child < vec.size()) {  // If root is not a leaf, get the index of its largest child, either left or right
+  if (child < vec.size()) {  // ...if not, get the index of its smallest child(largest for min heap).
 
      int right_child = child + 1; 
 
-     if (compare(vec[child], vec[right_child])) {
+     if (compare(vec[child], vec[right_child])) { 
             
            child = right_child; 
       }
 
-      // If root smaller than right child, swap root with larger child...
+      // If root smaller(larger for min heap) than smallest(largest in a min heap) child, swap root with child.
       if (compare(vec[root], vec[child])) {
 
            std::swap(vec[root], vec[child]); 
 
-           // ... and continue the process 
+           // Recurse until there are no more children of the heap property has been restored
            sink(child);
       }  
   }
@@ -336,26 +336,4 @@ template<class T, class Comp> void heap<T, Comp>::show_level(int height, int cur
   
   ostr << str << std::flush; 
 } 
-
-/*
-template<class T, class Comp> inline typename heap<T, Comp>::array_iterator heap<T, Comp>::begin() noexcept
-{
-  return iterator{*this};
-}
-
-template<class T, class Comp> inline typename heap<T, Comp>::array_iterator heap<T, Comp>::end() noexcept
-{
-   return iterator{*this, 0};
-}
-
-template<class T, class Comp> inline typename heap<T, Comp>::const_array_iterator heap<T, Comp>::begin() const noexcept
-{
-  return const_array_iterator{*this};
-}
-
-template<class T, class Comp> inline typename heap<T, Comp>::const_array_iterator heap<T, Comp>::end() const noexcept
-{
-   return const_array_iterator{*this, 0};
-}
-*/
 #endif	
