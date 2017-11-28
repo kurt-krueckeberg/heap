@@ -141,9 +141,14 @@ template<class T, class Comp> class heap {
      using value_type = std::pair<const int, T>; 
      using reference = std::pair<const int, T>&; 
    
-     heap(int size);
      heap();
+     heap(int height);
+     heap(const heap& lhs);
+     heap(heap&& lhs);
      
+     heap& operator=(const heap& lhs); 
+     heap& operator=(heap&& lhs); 
+
      bool isEmpty() const;
      
      T peekTop() const;
@@ -201,8 +206,10 @@ template<class T, class Comp> T heap<T, Comp>::peekTop() const
       throw std::logic_error(std::string("peekTop() called on empty heap"));
    }
 }
-
-template<class T, class Comp> inline heap<T, Comp>::heap(int sz) : vec(sz), size{0} 
+/*
+ * Input: height, number of levels of complete binary tree, of heap.
+ */
+template<class T, class Comp> inline heap<T, Comp>::heap(int height) : vec(pow(2, height) - 1), size{0} 
 {
 }
 
@@ -210,6 +217,31 @@ template<class T, class Comp> inline heap<T, Comp>::heap() : vec(), size{0}
 {
 }
 
+template<class T, class Comp> inline heap<T, Comp>::heap(const heap& lhs) : vec{lhs.vec}, size{lhs.size} 
+{
+}
+
+template<class T, class Comp> inline heap<T, Comp>::heap(heap&& lhs) : vec{std::move(lhs.vec)}, size{lhs.vec} 
+{
+}
+
+template<class T, class Comp> inline heap<T, Comp>& heap<T, Comp>::operator=(const heap& lhs) 
+{
+  if (this != &lhs) {
+     vec = lhs.vec;
+     size = lhs.size;
+  }
+  return *this;
+}
+
+template<class T, class Comp> inline heap<T, Comp>& heap<T, Comp>::operator=(heap&& lhs) 
+{
+  if (this != &lhs) {
+     vec = std::move(lhs.vec);
+     size = lhs.size;
+  }
+  return *this;
+}
 
 template<class T, class Comp> void heap<T, Comp>::add(int x, const T& t)
 {
