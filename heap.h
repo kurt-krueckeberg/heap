@@ -22,161 +22,161 @@ template<class T> class min_heap : public heap<T, std::greater<T>>  {};
 
 template<class T, class Comp> class heap {
   
-    class Node {
-        
-        friend class heap<T, Comp>;
-
-        union {
-           std::pair<int, T> pair;
-           std::pair<const int, T> constkey_pair;
-        };
+   class Node {
        
-        constexpr const std::pair<const int, T>& getPair() const noexcept
-        { 
-          return constkey_pair; 
-        } 
+      friend class heap<T, Comp>;
 
-        constexpr std::pair<const int, T>& getPair() noexcept
-        { 
-          return constkey_pair; 
-        }
+      union {
+         std::pair<int, T> pair;
+         std::pair<const int, T> constkey_pair;
+      };
+      
+      constexpr const std::pair<const int, T>& getPair() const noexcept
+      { 
+        return constkey_pair; 
+      } 
 
-      public: 
-               
-        Node(int priority, const T& t) : pair{priority, t} {}
+      constexpr std::pair<const int, T>& getPair() noexcept
+      { 
+        return constkey_pair; 
+      }
 
-        Node(int priority, T&& t) : pair{priority, std::move(t)} {}
+     public: 
+              
+      Node(int priority, const T& t) : pair{priority, t} {}
 
-        Node(const Node& n) : pair{n.pair}
-        {
-        }
-        
-        Node(Node&& node) : pair{std::move(node.pair)} 
-        {
-        }
+      Node(int priority, T&& t) : pair{priority, std::move(t)} {}
 
-        Node& operator=(const Node& n);
-        
-        Node& operator=(Node&& n);
-         
-        const T& getData() const 
-        { 
-            return pair.second; 
-        }
-         
-        T& getData() noexcept
-        { 
-            return pair.second; 
-        }
+      Node(const Node& n) : pair{n.pair}
+      {
+      }
+      
+      Node(Node&& node) : pair{std::move(node.pair)} 
+      {
+      }
 
-        int getPriority() const noexcept 
-        { 
-            return pair.first; 
-        } 
+      Node& operator=(const Node& n);
+      
+      Node& operator=(Node&& n);
        
-        friend bool operator<(const Node& lhs, const Node& rhs)
-        { 
-            return lhs.getPriority() < rhs.getPriority();
-        }
-        
-        friend bool operator>(const Node& lhs, const Node& rhs)
-        {
-            return lhs.getPriority() > rhs.getPriority(); 
-        }    
+      const T& getData() const 
+      { 
+          return pair.second; 
+      }
+       
+      T& getData() noexcept
+      { 
+          return pair.second; 
+      }
 
-        std::ostream& print(std::ostream& ostr) const noexcept
-        {          
-          return  ostr << '[' << getPriority() << ']' << std::flush;
-        } 
+      int getPriority() const noexcept 
+      { 
+          return pair.first; 
+      } 
+      
+      friend bool operator<(const Node& lhs, const Node& rhs)
+      { 
+          return lhs.getPriority() < rhs.getPriority();
+      }
+      
+      friend bool operator>(const Node& lhs, const Node& rhs)
+      {
+          return lhs.getPriority() > rhs.getPriority(); 
+      }    
 
-        friend std::ostream& operator<<(std::ostream& ostr, const Node& node)
-        {
-            return node.print(ostr);
-        }
-    };
+      std::ostream& print(std::ostream& ostr) const noexcept
+      {          
+        return  ostr << '[' << getPriority() << ']' << std::flush;
+      } 
 
-    std::vector<Node> vec;
-    Comp compare_functor;
-    
-    int size;
+      friend std::ostream& operator<<(std::ostream& ostr, const Node& node)
+      {
+          return node.print(ostr);
+      }
+   };
 
-    bool compare(const Node& lhs, const Node& rhs)
-    {
-       return compare_functor(lhs.getPriority(), rhs.getPriority());		
-    }	
-
-    /* 
-     * bottom-up repair of heap property ("swim up"). Continues to swap the value at vec[pos] with its parent until the parent's priority >= than vec[pos].getPriority().
-     * until we again have a valid heap. 
-     */ 
-    void swim(int pos); 
-    
-    /*
-     * top-down reheapify. Move the value at vec[pos] downward ("sink down"), if necessary, until the 'priority of parent of vec[pos]' is >= vec[pos].getPriority().        
-     */
-    void sink(int pos); 
-
-    int parent(int pos) const noexcept
-    {
-       return (pos - 1) / 2; 
-    }
-
-    int leftChild(int pos) const noexcept
-    {
-       return 2 * pos + 1;
-    }
-
-    int rightChild(int pos) const noexcept
-    {
-       return 2 * pos + 2;
-    }
-
-    bool is_leaf(int pos) const noexcept 
-    { 
-       return leftChild(pos) >= vec.size() ? true : false; 
-    }  
-
-    public:   
-
-     using value_type = std::pair<const int, T>; 
-     using reference = std::pair<const int, T>&; 
+   std::vector<Node> vec;
+   Comp compare_functor;
    
-     heap();
-     heap(int height);
-     heap(const heap& lhs);
-     heap(heap&& lhs);
-     
-     heap& operator=(const heap& lhs); 
-     heap& operator=(heap&& lhs); 
+   int size;
 
-     bool isEmpty() const;
-     
-     T peekTop() const;
-     
-     void add(int priority, const T& t);
-     
-     bool remove();
-     
-     void clear();
-     
-     int height() const noexcept;
-     
-     void print_heap(std::ostream&) const noexcept; 
+   bool compare(const Node& lhs, const Node& rhs)
+   {
+      return compare_functor(lhs.getPriority(), rhs.getPriority());		
+   }	
 
-     void show_level(int height, int level, std::ostream& ostr) const noexcept; 
+   /* 
+    * bottom-up repair of heap property ("swim up"). Continues to swap the value at vec[pos] with its parent until the parent's priority >= than vec[pos].getPriority().
+    * until we again have a valid heap. 
+    */ 
+   void swim(int pos); 
+   
+   /*
+    * top-down reheapify. Move the value at vec[pos] downward ("sink down"), if necessary, until the 'priority of parent of vec[pos]' is >= vec[pos].getPriority().        
+    */
+   void sink(int pos); 
 
-     friend std::ostream&  operator<<(std::ostream&  ostr, const heap& lhs_heap) 
-     {
-         lhs_heap.print_heap(ostr);
-         return ostr;
-     }
+   int parent(int pos) const noexcept
+   {
+      return (pos - 1) / 2; 
+   }
+
+   int leftChild(int pos) const noexcept
+   {
+      return 2 * pos + 1;
+   }
+
+   int rightChild(int pos) const noexcept
+   {
+      return 2 * pos + 2;
+   }
+
+   bool is_leaf(int pos) const noexcept 
+   { 
+      return leftChild(pos) >= vec.size() ? true : false; 
+   }  
+
+   public:   
+
+    using value_type = std::pair<const int, T>; 
+    using reference = std::pair<const int, T>&; 
+   
+    heap();
+    heap(int height);
+    heap(const heap& lhs);
+    heap(heap&& lhs);
+    
+    heap& operator=(const heap& lhs); 
+    heap& operator=(heap&& lhs); 
+
+    bool isEmpty() const;
+    
+    T peekTop() const;
+    
+    void add(int priority, const T& t);
+    
+    bool remove();
+    
+    void clear();
+    
+    int height() const noexcept;
+    
+    void print_heap(std::ostream&) const noexcept; 
+
+    void show_level(int height, int level, std::ostream& ostr) const noexcept; 
+
+    friend std::ostream&  operator<<(std::ostream&  ostr, const heap& lhs_heap) 
+    {
+        lhs_heap.print_heap(ostr);
+        return ostr;
+    }
 };
 
 template<class T, class Comp> typename heap<T, Comp>::Node& heap<T, Comp>::Node::operator=(const typename heap<T, Comp>::Node& n)
 {
    if (this != &n) { 
     
-        pair = n.pair;           
+       pair = n.pair;           
    } 
    return *this;
 }       
@@ -185,9 +185,9 @@ template<class T, class Comp> typename heap<T, Comp>::Node& heap<T, Comp>::Node:
 {
    if (this != &n) { 
 
-        pair = std::move(n.pair);       
-    } 
-    return *this;
+       pair = std::move(n.pair);       
+   } 
+   return *this;
 }       
 
 template<class T, class Comp> inline bool heap<T, Comp>::isEmpty() const
@@ -223,6 +223,7 @@ template<class T, class Comp> inline heap<T, Comp>::heap(const heap& lhs) : vec{
 
 template<class T, class Comp> inline heap<T, Comp>::heap(heap&& lhs) : vec{std::move(lhs.vec)}, size{lhs.vec} 
 {
+   lhs.size = 0;
 }
 
 template<class T, class Comp> inline heap<T, Comp>& heap<T, Comp>::operator=(const heap& lhs) 
@@ -239,6 +240,7 @@ template<class T, class Comp> inline heap<T, Comp>& heap<T, Comp>::operator=(hea
   if (this != &lhs) {
      vec = std::move(lhs.vec);
      size = lhs.size;
+     lhs.size = 0;
   }
   return *this;
 }
@@ -256,24 +258,24 @@ template<class T, class Comp> void heap<T, Comp>::add(int x, const T& t)
 
 template<class T, class Comp> void heap<T, Comp>::swim(int index)
 {
-    // Move new item up until we have a valid heap
-    int parentIndex;
+   // Move new item up until we have a valid heap
+   int parentIndex;
 
-    while (index > 0) { 
+   while (index > 0) { 
 
-        parentIndex = (index - 1) / 2;
-        
-       if (compare(vec[index], vec[parentIndex])) {
+       parentIndex = (index - 1) / 2;
        
-           break; 
+      if (compare(vec[index], vec[parentIndex])) {
+      
+          break; 
 
-        }  else {        
+       }  else {        
 
-           std::swap(vec[index], vec[parentIndex]);
+          std::swap(vec[index], vec[parentIndex]);
 
-           index = parentIndex;
-        }
-    }
+          index = parentIndex;
+       }
+   }
 }
 
 template<class T, class Comp> bool heap<T, Comp>::remove()
@@ -309,16 +311,16 @@ template<class T, class Comp> inline void heap<T, Comp>::sink(int root)
 
      if (compare(vec[child], vec[right_child])) { 
             
-           child = right_child; 
+         child = right_child; 
       }
 
       // If root smaller(larger for min heap) than smallest(largest in a min heap) child, swap root with child.
       if (compare(vec[root], vec[child])) {
 
-           std::swap(vec[root], vec[child]); 
+         std::swap(vec[root], vec[child]); 
 
-           // Recurse until there are no more children of the heap property has been restored
-           sink(child);
+         // Recurse until there are no more children of the heap property has been restored
+         sink(child);
       }  
   }
 }
